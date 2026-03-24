@@ -19,7 +19,7 @@ def main():
             model = os.getenv('LLM_MODEL'),
             messages=[
                 {"role": "system", "content": "Always refer to me as 'sir fuego the wise' and every answer to a prompt must greet me."},
-                {"role": "user", "content": x}
+                {"role": "user", "content": [{"type": "input_text", "text": "what's in this image?"}, {"type": "input_image", "image_url": f"data:image/jpeg:base64,{x}"}]}
             ], #possible tweak this to look at objects instead of JSON format
             temperature=0.7, #Lower numbers more predictable, higher gives more creativity
             reasoning_effort="high",) 
