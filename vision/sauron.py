@@ -13,6 +13,13 @@ from openai import OpenAI
 import base64
 from PIL import Image
 import io 
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Get BASE_PATH from environment variable
+BASE_PATH = os.environ.get('BASE_PATH')
 """
 Crucial tool since the ai yaps too much need to distinguish a little easier
 """
@@ -34,7 +41,7 @@ Trade off of base64 though is that it increases the file size by around 33%
 def img_to_base64(image_path):
     try: 
         # Construct the full path to the image.  This is crucial.
-        full_path = os.path.join(os.getcwd(), "IMIGES", image_path) #os.getcwd() gets current working directory
+        full_path = os.path.join(BASE_PATH, "IMIGES", image_path) #os.getcwd() gets current working directory
         print(full_path)
 
         # Uses PIL to open image file
@@ -43,7 +50,7 @@ def img_to_base64(image_path):
             print("Pil opened the image file")
         else:
             print("PIL didnt work")
-        img.save("monkey.jpg", format="JPEG") #build new path with new file name <==== This is the problem
+        img.save(image, format="JPEG") #build new path with new file name <==== This is the problem
 
 
         """
@@ -81,6 +88,16 @@ def img_to_base64(image_path):
     except Exception as e:
         help_me_read(f"A general error occurred {e}")
         return None
+
+def img_to_base64_2(image_path):
+    # path_to_file can be a string, pathlib.Path, etc.
+    full_path = os.path.join(BASE_PATH, "IMIGES", image_path)
+    with open(full_path, "rb") as f:      # <-- binary mode
+        data = bytearray(f.read())    
+    base_64_result = base64.b64encode(data).decode('utf-8')      # read entire file into memory
+    return base_64_result
+    
+
 
 """
 If img_to_base64 is able to convert into base64 string then it will feed a prompt along with the image_url 

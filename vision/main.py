@@ -10,20 +10,25 @@ def main():
         x = input("Enter image name: ")
         if x == "quit" or x =='q':
             break
-        base_64_img = sauron.img_to_base64(x)
+        base_64_img = sauron.img_to_base64_2(x)
         if base_64_img:
             print("img to url to prompt calle")
-            x = sauron.image_url_to_prompt(base_64_img)
-            print(x)
-            completion = client.chat.completions.create(
+            #x = sauron.image_url_to_prompt(base_64_img)
+            completion = client.responses.create(
             model = os.getenv('LLM_MODEL'),
-            messages=[
-                {"role": "system", "content": "Always refer to me as 'sir fuego the wise' and every answer to a prompt must greet me."},
-                {"role": "user", "content": [{"type": "input_text", "text": "what's in this image?"}, {"type": "input_image", "image_url": f"data:image/jpeg:base64,{x}"}]}
+            input=[
+                {"role": "user", 
+                 "content": [
+                    { "type": "input_text", "text": "what's in this image?" },
+                {
+                    "type": "input_image",
+                    "image_url": f"data:image/jpeg;base64,{base_64_img}",
+                }]}
             ], #possible tweak this to look at objects instead of JSON format
-            temperature=0.7, #Lower numbers more predictable, higher gives more creativity
-            reasoning_effort="high",) 
-            print(completion.choices[0].message.content)
+            # temperature=0.7, #Lower numbers more predictable, higher gives more creativity
+            # reasoning_effort="high",) 
+            )
+            print(completion.output_text)
         else:
             print("Failure")
 
