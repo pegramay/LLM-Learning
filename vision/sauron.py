@@ -50,9 +50,12 @@ def img_to_base64(image_path):
             print("Pil opened the image file")
         else:
             print("PIL didnt work")
-        img.save(image, format="JPEG") #build new path with new file name <==== This is the problem
-
-
+        if img.mode == "RGBA": #PNG has transparency capabilities 'A' so has to be stripped to just be RGB
+            img = img.convert("RGB")
+        bytearray = io.BytesIO()
+        img.save(bytearray, format="JPEG") #build new path with new file name <==== This is the problem
+        converted_img = bytearray.getvalue()
+        base64_string = base64.b64encode(converted_img).decode('utf-8')
         """
         A DIFFERENT METHOD USED HERE:
         found here: https://www.reddit.com/r/PythonProjects2/comments/1gdhayi/how_to_convert_image_to_base64_in_python/
@@ -63,18 +66,6 @@ def img_to_base64(image_path):
         Opens file using binary read mode
         Reads raw bytes (MAIN DIFF)
         """
-        #Read content of BytesIO as bytes
-        img_byte_arr = io.BytesIO()
-        img.save(img_byte_arr, format="JPEG")
-        img_byte_arr.seek(0)
-        img_bytes = img_byte_arr.read()
-        if img_bytes:
-            print("Contents read successfully")
-        else:
-            print("Contents failed to read")
-        #base64.b64encode(): Encodes the binary data to Base64 format.
-        #.decode('utf-8'): Converts the byte-like object into a readable string.
-        base64_string = base64.b64encode(img_bytes).decode('utf-8')
         if base64_string:
             print("Image converted succesfully")
         else:
@@ -89,11 +80,12 @@ def img_to_base64(image_path):
         help_me_read(f"A general error occurred {e}")
         return None
 
+#loaded byte array want to conver to PIL img and convert pile 
 def img_to_base64_2(image_path):
     # path_to_file can be a string, pathlib.Path, etc.
     full_path = os.path.join(BASE_PATH, "IMIGES", image_path)
     with open(full_path, "rb") as f:      # <-- binary mode
-        data = bytearray(f.read())    
+        data = bytearray(f.read())    #<=== From here conver to PIL image then in memory convert into jpg image
     base_64_result = base64.b64encode(data).decode('utf-8')      # read entire file into memory
     return base_64_result
     
